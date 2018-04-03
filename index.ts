@@ -1,5 +1,5 @@
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-const toStringg = Object.prototype.toString;
+const toString = Object.prototype.toString;
 
 /**
  * Проверяет, что переданный объект является "плоским" (т.е. созданным с помощью "{}"
@@ -8,14 +8,15 @@ const toStringg = Object.prototype.toString;
  * @param {Object} obj
  * @returns {Boolean}
  */
-function isPlainObject(obj: Object) {
-    if (toStringg.call(obj) !== '[object Object]') {
+function isPlainObject(obj: object): boolean {
+    if (toString.call(obj) !== '[object Object]') {
         return false;
     }
 
     const prototype = Object.getPrototypeOf(obj);
     return prototype === null ||
         prototype === Object.prototype;
+
 }
 
 /**
@@ -27,12 +28,10 @@ function isPlainObject(obj: Object) {
  *      `null` или `undefined` игнорируются.
  * @returns {Object}
  */
-const extend = function extend(...args) {
-    let target: object = args[0];
+const extend = function extend(...args: any[]): object {
+    let target: boolean | object = args[0];
     let deep: boolean;
-    let i: number;
-    
-    console.log(typeof target);
+    let i;
 
     // Обрабатываем ситуацию глубокого копирования.
     if (typeof target === 'boolean') {
@@ -45,7 +44,7 @@ const extend = function extend(...args) {
     }
 
     for (; i < arguments.length; i++) {
-        const obj = args[i];
+        const obj: object = args[i];
         if (!obj) {
             continue;
         }
@@ -53,6 +52,8 @@ const extend = function extend(...args) {
         for (const key in obj) {
             if (hasOwnProperty.call(obj, key)) {
                 const val = obj[key];
+
+
                 const isArray = val && Array.isArray(val);
 
                 // Копируем "плоские" объекты и массивы рекурсивно.
@@ -64,6 +65,7 @@ const extend = function extend(...args) {
                     } else {
                         clone = src && isPlainObject(src) ? src : {};
                     }
+                    console.log(deep, clone, val);
                     target[key] = extend(deep, clone, val);
                 } else {
                     target[key] = val;
@@ -76,13 +78,49 @@ const extend = function extend(...args) {
 };
 
 let obj1 = {
-    foo: 'bar',
-    bar: 123
+    obj1_1: 123,
+    obj1_2: 321,
+    obj1_3: () => {
+        return this.obj1_1 + 'hui';
+    }
 };
 
 let obj2 = {
-    can: 'nana',
-    block: true
+    obj2_1: 'foo',
+    obj2_2: 111,
+    obj2_3: {
+        aa: 'aa',
+        bb: 'bb'
+    }
 };
 
-extend(obj1, obj2);
+let obj3 = {
+    obj3_1: 'foo',
+    obj3_2: 111,
+    obj3_3: {
+        aa: 'aa',
+        bb: 'bb'
+    }
+};
+
+
+
+let arr1 = [
+    true,
+    {},
+    obj1,
+    obj2,
+    obj3
+];
+
+
+console.log('--true--');
+let res = extend(...arr1);
+console.log(res);
+
+
+
+
+/*
+console.log('--obj--');
+console.log(extend(...arr2));*/
