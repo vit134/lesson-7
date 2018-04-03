@@ -28,13 +28,16 @@ function isPlainObject(obj: object): boolean {
  *      `null` или `undefined` игнорируются.
  * @returns {Object}
  */
-const extend = function extend(...args: any[]): object {
+const extend = function extend<T>(...args: T[]) {
     let target: boolean | object = args[0];
     let deep: boolean;
     let i;
 
+
+
     // Обрабатываем ситуацию глубокого копирования.
     if (typeof target === 'boolean') {
+
         deep = target;
         target = args[1];
         i = 2;
@@ -51,21 +54,22 @@ const extend = function extend(...args: any[]): object {
 
         for (const key in obj) {
             if (hasOwnProperty.call(obj, key)) {
-                const val = obj[key];
-
+                const val: any = obj[key];
 
                 const isArray = val && Array.isArray(val);
 
                 // Копируем "плоские" объекты и массивы рекурсивно.
                 if (deep && val && (isPlainObject(val) || isArray)) {
                     const src = target[key];
+
                     let clone;
+
                     if (isArray) {
                         clone = src && Array.isArray(src) ? src : [];
                     } else {
                         clone = src && isPlainObject(src) ? src : {};
                     }
-                    console.log(deep, clone, val);
+
                     target[key] = extend(deep, clone, val);
                 } else {
                     target[key] = val;
@@ -74,48 +78,13 @@ const extend = function extend(...args: any[]): object {
         }
     }
 
+    console.log(target);
     return target;
 };
 
-let obj1 = {
-    obj1_1: 123,
-    obj1_2: 321,
-    obj1_3: () => {
-        return this.obj1_1 + 'hui';
-    }
-};
-
-let obj2 = {
-    obj2_1: 'foo',
-    obj2_2: 111,
-    obj2_3: {
-        aa: 'aa',
-        bb: 'bb'
-    }
-};
-
-let obj3 = {
-    obj3_1: 'foo',
-    obj3_2: 111,
-    obj3_3: {
-        aa: 'aa',
-        bb: 'bb'
-    }
-};
-
-
-
-let arr1 = [
-    true,
-    {},
-    obj1,
-    obj2,
-    obj3
-];
-
 
 console.log('--true--');
-let res = extend(...arr1);
+let res = extend<[boolean | object, object]>([true, {}, 'asd', {asd: 'asd', bsd: 'bsd'}]);
 console.log(res);
 
 
