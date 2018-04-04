@@ -1,5 +1,5 @@
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-const toStringg = Object.prototype.toString;
+const toString = Object.prototype.toString;
 
 /**
  * Проверяет, что переданный объект является "плоским" (т.е. созданным с помощью "{}"
@@ -8,8 +8,8 @@ const toStringg = Object.prototype.toString;
  * @param {Object} obj
  * @returns {Boolean}
  */
-function isPlainObject(obj: object) {
-    if (toStringg.call(obj) !== '[object Object]') {
+function isPlainObject(obj: object): boolean {
+    if (toString.call(obj) !== '[object Object]') {
         return false;
     }
 
@@ -27,30 +27,20 @@ function isPlainObject(obj: object) {
  *      `null` или `undefined` игнорируются.
  * @returns {Object}
  */
-const extend = function extend(...args: any[]):object {
-    let target = args[0];
-    let deep;
-    let i;
+const extend = function extend(deep: boolean, ...args: object[]) {
+    let target: object = args[1];
+    let i = deep ? 2 : 1;
 
-    // Обрабатываем ситуацию глубокого копирования.
-    if (typeof target === 'boolean') {
-        deep = target;
-        target = args[1];
-        i = 2;
-    } else {
-        deep = false;
-        i = 1;
-    }
-
-    for (; i < arguments.length; i++) {
-        const obj = args[i];
+    for (; i < args.length; i++) {
+        const obj: object = args[i];
         if (!obj) {
             continue;
         }
 
         for (const key in obj) {
             if (hasOwnProperty.call(obj, key)) {
-                const val = obj[key];
+                const val: object = obj[key];
+                console.log(val);
                 const isArray = val && Array.isArray(val);
 
                 // Копируем "плоские" объекты и массивы рекурсивно.
@@ -73,7 +63,8 @@ const extend = function extend(...args: any[]):object {
     return target;
 };
 
+let res = extend(true, ...[{}, {aaa: 'aaa', bbb: 'bbb', asd: {dsa: 'dsa', qwe: 'ewq'}}, {ccc: null, undefined: 111, dfg: ['123', 321]}, {eee: 'eee', ddd: 'ddd'}]);
 
-let res = extend(true, {}, {asd: 'asd', bsd: {asdasd: 'asdasd', bla: null}}, {aaa: 'aaa', bbb: 123});
+//let res = extend(...[true, {}, {asd: 'asd', bsd: {asdasd: 'asdasd', bla: null, null: 'bla'}}, {aaa: 'aaa', bbb: 123}]);
 
 console.log(res);
